@@ -51,6 +51,11 @@ To see the full list of changes check the list of `Git commits <https://github.c
 pgRouting 3.0.0 Release Notes
 -------------------------------------------------------------------------------
 
+.. rubric:: Fixed Issues
+
+* `#1153 <https://github.com/pgRouting/pgrouting/issues/1153>`__: Renamed pgr_eucledianTSP to pgr_TSPeuclidean
+* `#1188 <https://github.com/pgRouting/pgrouting/issues/1188>`__: Removed CGAL dependency
+
 .. rubric:: New Experimental functions
 
 * Prim family
@@ -145,6 +150,10 @@ pgRouting 3.0.0 Release Notes
     * pgr_maxFlowBoykovKolmogorov
     * pgr_maxFlowEdmondsKarp
     * pgr_maximumcardinalitymatching
+
+* TSP old signatures
+* pgr_pointsAsPolygon
+* pgr_alphaShape old signature
 
 
 

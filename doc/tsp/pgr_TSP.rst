@@ -10,7 +10,7 @@
 pgr_TSP
 =============================================================================
 
-* ``pgr_TSP`` - Returns a route that visits all the nodes exactly once.
+* ``pgr_TSP`` - Using *Simulated Annealing* approximation algorithm
 
 .. rubric:: Availability: 2.0.0
 
@@ -19,79 +19,56 @@ pgr_TSP
 Description
 -------------------------------------------------------------------------------
 
-**The main characteristics are:**
+.. include:: TSP-family.rst
+   :start-after: tsp problem definition start
+   :end-before: tsp problem definition end
 
-The travelling salesman problem (TSP) or travelling salesperson problem asks the following question:
-
-- Given a list of cities and the distances between each pair of cities, what is the shortest possible route that visits each city exactly once and returns to the origin city?
-
-This implementation uses simulated annealing to return the approximate solution when the input is given in the form of matrix cell contents.
-The matrix information must be symmetrical.
+See :ref:`simulated-annealing` for a complete description of this implementation
 
 Signatures
 -------------------------------------------------------------------------------
 
-.. Rubric:: Summary
-
-.. code-block:: none
-
-    pgr_TSP(matrix_cell_sql)
-    pgr_TSP(matrix_cell_sql,
-        start_id, end_id,
-        max_processing_time,
-        tries_per_temperature, max_changes_per_temperature, max_consecutive_non_changes,
-        initial_temperature, final_temperature, cooling_factor,
-        randomize,
-    RETURNS SETOF (seq, node, cost, agg_cost)
+.. rubric:: Summary
 
 .. index::
-    single: TSP(Basic Use)
-
-.. rubric:: Basic Use
+    single: TSP
 
 .. code-block:: none
 
-    pgr_TSP(matrix_cell_sql)
+    pgr_TSP(Matrix SQL,
+        [start_id], [end_id],
+        [max_processing_time],
+        [tries_per_temperature], [max_changes_per_temperature], [max_consecutive_non_changes],
+        [initial_temperature], [final_temperature], [cooling_factor],
+        [randomize])
     RETURNS SETOF (seq, node, cost, agg_cost)
 
-:Example:
-
-Because the documentation examples are auto generated and tested for non changing results,
-and the default is to have random execution, the example is wrapping the actual call.
+:Example: Not having a random execution
 
 .. literalinclude:: doc-pgr_TSP.queries
    :start-after: -- q1
    :end-before: -- q2
 
-..
-    TODO Intermediate Use
+Parameters
+-------------------------------------------------------------------------------
 
-.. index::
-    single: TSP(Complete Signature)
+====================  =================================================
+Parameter             Description
+====================  =================================================
+**Matrix SQL**        an SQL query, described in the `Inner query`_
+====================  =================================================
 
-.. rubric:: Complete Signature
+Optional Parameters
+...............................................................................
 
-.. code-block:: none
-
-
-    pgr_TSP(matrix_cell_sql,
-        start_id, end_id,
-        max_processing_time,
-        tries_per_temperature, max_changes_per_temperature, max_consecutive_non_changes,
-        initial_temperature, final_temperature, cooling_factor,
-        randomize,
-    RETURNS SETOF (seq, node, cost, agg_cost)
-
-:Example:
-
-.. literalinclude:: doc-pgr_TSP.queries
-   :start-after: -- q2
-   :end-before: -- q3
+.. include:: TSP-family.rst
+   :start-after: tsp control parameters begin
+   :end-before: tsp control parameters end
 
 Inner query
 -------------------------------------------------------------------------------
 
-.. rubric:: Description of the Matrix Cell SQL query
+**Matrix SQL**: an SQL query, which should return a set of rows with the following columns:
 
 ============= =========== =================================================
 Column        Type              Description
@@ -101,32 +78,26 @@ Column        Type              Description
 **agg_cost**  ``FLOAT``   Cost for going from start_vid to end_vid
 ============= =========== =================================================
 
-Can be Used with:
+Can be Used with :doc:`costMatrix-category` functions with `directed := false`.
 
-* :doc:`pgr_dijkstraCostMatrix`
-* :doc:`pgr_withPointsCostMatrix`
-* :doc:`pgr_floydWarshall`
-* :doc:`pgr_johnson`
-
-To generate a symmetric matrix
-
-* directed := false.
-
-If using directed := true, the resulting non symmetric matrix must be converted to
+If using `directed := true`, the resulting non symmetric matrix must be converted to
 symmetric by fixing the non symmetric values according to your application needs.
 
+Result Columns
+-------------------------------------------------------------------------------
 
-.. literalinclude:: TSP-family.rst
-   :start-after: tsp control parameters begin
-   :end-before: tsp control parameters end
-
-
-.. literalinclude:: TSP-family.rst
+.. include:: TSP-family.rst
    :start-after: tsp return values begin
    :end-before: tsp return values end
 
 Additional Examples
 -------------------------------------------------------------------------------
+
+:Example: Start from vertex :math:`7`
+
+.. literalinclude:: doc-pgr_TSP.queries
+   :start-after: -- q2
+   :end-before: -- q3
 
 :Example: Using with points of interest.
 
@@ -145,8 +116,9 @@ See Also
 -------------------------------------------------------------------------------
 
 * :doc:`TSP-family`
-* http://en.wikipedia.org/wiki/Traveling_salesman_problem
-* http://en.wikipedia.org/wiki/Simulated_annealing
+* `Simulated annaeling algorithm for beginners <http://www.theprojectspot.com/tutorial-post/simulated-annealing-algorithm-for-beginners/6>`__
+* `Wikipedia: Traveling Salesman Problem <http://en.wikipedia.org/wiki/Traveling_salesman_problem>`__
+* `Wikipedia: Simulated annealing <http://en.wikipedia.org/wiki/Simulated_annealing>`__
 
 .. rubric:: Indices and tables
 
