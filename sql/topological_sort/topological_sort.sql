@@ -1,8 +1,10 @@
 /*PGR-GNU*****************************************************************
-File: pgr_components_rt.h
 
-Copyright (c) 2017 Maoguang Wang
-Mail: xjtumg1007@gmail.com
+Copyright (c) 2015 pgRouting developers
+Mail: project@pgrouting.org
+
+Copyright (c) 2019 Hang Wu
+mail: nike0good@gmail.com
 
 ------
 
@@ -21,24 +23,34 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 ********************************************************************PGR-GNU*/
-/*! @file */
 
-#ifndef INCLUDE_C_TYPES_PGR_COMPONENTS_RT_H_
-#define INCLUDE_C_TYPES_PGR_COMPONENTS_RT_H_
-#pragma once
+---------------
+-- pgr_topological_sort
+---------------
+
+CREATE OR REPLACE FUNCTION pgr_topological_sort(
+    TEXT,   -- edges_sql (required)
+    
+    OUT seq INTEGER,
+    OUT sorted_v INTEGER)
+RETURNS SETOF RECORD AS
+$BODY$
+    SELECT a.seq, a.sorted_v
+    FROM _pgr_topological_sort(_pgr_get_statement($1)) AS a;
+$BODY$
+LANGUAGE sql VOLATILE STRICT
+COST 100
+ROWS 1000;
 
 
-/* for int64_t */
-#ifdef __cplusplus
-#   include <cstdint>
-#else
-#   include <stdint.h>
-#endif
+-- COMMENTS
+
+COMMENT ON FUNCTION pgr_topological_sort(TEXT)
+IS 'pgr_topological_sort
+- Parameters:
+   - Edges SQL with columns: id, source, target, cost [,reverse_cost]
+- Documentation:
+   - ${PGROUTING_DOC_LINK}/pgr_topological_sort.html
+';
 
 
-typedef struct {
-    int64_t component;
-    int64_t identifier;
-} pgr_components_rt;
-
-#endif  // INCLUDE_C_TYPES_PGR_COMPONENTS_RT_H_

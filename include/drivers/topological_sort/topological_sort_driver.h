@@ -1,13 +1,14 @@
 /*PGR-GNU*****************************************************************
-File: articulationPoints_driver.h
+
+File: topological_sort_driver.h
 
 Generated with Template by:
 Copyright (c) 2015 pgRouting developers
 Mail: project@pgrouting.org
 
 Function's developer:
-Copyright (c) 2017 Maoguang Wang
-Mail: xjtumg1007@gmail.com
+Copyright (c) 2019 Hang Wu
+mail: nike0good@gmail.com
 
 ------
 
@@ -27,9 +28,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 ********************************************************************PGR-GNU*/
 
-#ifndef INCLUDE_DRIVERS_COMPONENTS_ARTICULATIONPOINTS_DRIVER_H_
-#define INCLUDE_DRIVERS_COMPONENTS_ARTICULATIONPOINTS_DRIVER_H_
-#pragma once
+#ifndef INCLUDE_DRIVERS_TOPOLOGICAL_SORT_TOPOLOGICAL_SORT_DRIVER_H_
+#define INCLUDE_DRIVERS_TOPOLOGICAL_SORT_TOPOLOGICAL_SORT_DRIVER_H_
 
 /* for size-t */
 #ifdef __cplusplus
@@ -39,32 +39,27 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #endif
 
 #include "c_types/pgr_edge_t.h"
-#include "c_types/pgr_components_rt.h"
+#include "c_types/pgr_topological_sort_t.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-    /*********************************************************
-      TEXT,
-    BIGINT,
-    BIGINT,
-     ********************************************************/
+    //  CREATE OR REPLACE FUNCTION pgr_topological_sort(
+    //  sql text,
+    void do_pgr_topological_sort(
+            pgr_edge_t  *data_edges,
+            size_t total_tuples,
 
+            pgr_topological_sort_t **return_tuples,
+            size_t *return_count,
 
-    void
-        do_pgr_articulationPoints(
-                pgr_edge_t  *data_edges,
-                size_t total_edges,
-                int64_t **return_tuples,
-                size_t *return_count,
-                char ** log_msg,
-                char ** notice_msg,
-                char ** err_msg);
-
+            char** log_msg,
+            char** notice_msg,
+            char** err_msg);
 
 #ifdef __cplusplus
-}
+    }
 #endif
 
-#endif  // INCLUDE_DRIVERS_COMPONENTS_ARTICULATIONPOINTS_DRIVER_H_
+#endif  // INCLUDE_DRIVERS_TOPOLOGICAL_SORT_DRIVER_H_

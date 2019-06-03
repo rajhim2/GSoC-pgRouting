@@ -1,13 +1,13 @@
 /*PGR-GNU*****************************************************************
-File: biconnectedComponents_driver.cpp
+File: topological_sort_driver.cpp
 
 Generated with Template by:
 Copyright (c) 2015 pgRouting developers
 Mail: project@pgrouting.org
 
 Function's developer:
-Copyright (c) 2017 Maoguang Wang
-Mail: xjtumg1007@gmail.com
+Copyright (c) 2019 Hang Wu
+mail: nike0good@gmail.com
 
 ------
 
@@ -27,25 +27,49 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 ********************************************************************PGR-GNU*/
 
-#include "drivers/components/biconnectedComponents_driver.h"
+#include "drivers/topological_sort/topological_sort_driver.h"
 
 #include <sstream>
 #include <deque>
 #include <vector>
+#include <algorithm>
+#include <limits>
 
-#include "components/pgr_components.hpp"
+#if 0
+#include "topological_sort/pgr_topological_sort.hpp"
+#endif
+//TODO(nike0good) : Remove below headers once pgr_topological_sort.hpp is implemented.
+#include "cpp_common/basePath_SSEC.hpp"
+#include "cpp_common/pgr_base_graph.hpp"
+//TODO(nike0good) : Complete file once pgr_topological_sort.hpp is implemented. 
 
 #include "cpp_common/pgr_alloc.hpp"
 #include "cpp_common/pgr_assert.h"
 
-#include "cpp_common/pgr_base_graph.hpp"
+template < class G >
+static
+std::vector<pgr_topological_sort_t>
+pgr_topological_sort(
+        G &graph) {
+#if 0
+    Pgr_topological_sort< G > fn_topological_sort;
+    return fn_topological_sort.topological_sort(graph);
+#endif
+    std::vector<pgr_topological_sort_t> vv;
+    return vv;
+}
 
 
+
+// CREATE OR REPLACE FUNCTION pgr_topological_sort(
+// sql text,
 void
-do_pgr_biconnectedComponents(
+do_pgr_topological_sort(
         pgr_edge_t  *data_edges,
         size_t total_edges,
-        pgr_components_rt **return_tuples,
+        
+
+        pgr_topological_sort_t **return_tuples,
         size_t *return_count,
         char ** log_msg,
         char ** notice_msg,
@@ -53,20 +77,24 @@ do_pgr_biconnectedComponents(
     std::ostringstream log;
     std::ostringstream err;
     std::ostringstream notice;
+
     try {
+        pgassert(total_edges != 0);
         pgassert(!(*log_msg));
         pgassert(!(*notice_msg));
         pgassert(!(*err_msg));
         pgassert(!(*return_tuples));
         pgassert(*return_count == 0);
-        pgassert(total_edges != 0);
 
-        graphType gType = UNDIRECTED;
+        graphType gType =  DIRECTED;
 
-        log << "Working with Undirected Graph\n";
-        pgrouting::UndirectedGraph undigraph(gType);
-        undigraph.insert_edges(data_edges, total_edges);
-        auto results(pgrouting::algorithms::biconnectedComponents(undigraph));
+        std::vector<pgr_topological_sort_t> results; 
+
+        log << "Working with Directed Graph\n";
+        pgrouting::DirectedGraph digraph(gType);
+        digraph.insert_edges(data_edges, total_edges);
+        results = pgr_topological_sort(
+                digraph);
 
         auto count = results.size();
 
@@ -74,7 +102,7 @@ do_pgr_biconnectedComponents(
             (*return_tuples) = NULL;
             (*return_count) = 0;
             notice <<
-                "No paths found between start_vid and end_vid vertices";
+                "No vertices";
             return;
         }
 
@@ -111,4 +139,3 @@ do_pgr_biconnectedComponents(
         *log_msg = pgr_msg(log.str().c_str());
     }
 }
-

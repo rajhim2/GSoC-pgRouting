@@ -1,14 +1,14 @@
 /*PGR-GNU*****************************************************************
-File: bridges.c
+
+File: many_to_many_dijkstra.c
 
 Generated with Template by:
 Copyright (c) 2015 pgRouting developers
 Mail: project@pgrouting.org
 
 Function's developer:
-Copyright (c) 2017 Maoguang Wang
-Mail: xjtumg1007@gmail.com
-
+Copyright (c) 2019 Hang Wu
+mail: nike0good@gmail.com
 
 ------
 
@@ -28,96 +28,102 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 ********************************************************************PGR-GNU*/
 
-/** @file bridges.c */
-
 #include <stdbool.h>
+
 #include "c_common/postgres_connection.h"
+#include "utils/array.h"
 
 
 #include "c_common/debug_macro.h"
 #include "c_common/e_report.h"
 #include "c_common/time_msg.h"
 #include "c_common/edges_input.h"
-
-#include "drivers/components/bridges_driver.h"
-
-PGDLLEXPORT Datum bridges(PG_FUNCTION_ARGS);
-PG_FUNCTION_INFO_V1(bridges);
-
+#include "c_common/arrays_input.h"
+#include "drivers/topological_sort/topological_sort_driver.h"
+#if 0
+PG_MODULE_MAGIC;
+#endif
+PGDLLEXPORT Datum topological_sort(PG_FUNCTION_ARGS);
+PG_FUNCTION_INFO_V1(topological_sort);
 
 static
 void
 process(
         char* edges_sql,
-        int64_t **result_tuples,
+        pgr_topological_sort_t **result_tuples,
         size_t *result_count) {
     pgr_SPI_connect();
 
-    (*result_tuples) = NULL;
-    (*result_count) = 0;
-
     pgr_edge_t *edges = NULL;
     size_t total_edges = 0;
-
     pgr_get_edges(edges_sql, &edges, &total_edges);
-
-    if (total_edges == 0) {
-        pgr_SPI_finish();
-        return;
-    }
-
+    
+    PGR_DBG("Starting timer");
     clock_t start_t = clock();
-    char *log_msg = NULL;
-    char *notice_msg = NULL;
-    char *err_msg = NULL;
-    do_pgr_bridges(
-            edges,
-            total_edges,
-
+    char* log_msg = NULL;
+    char* notice_msg = NULL;
+    char* err_msg = NULL;
+    do_pgr_topological_sort(
+            edges, total_edges,
+            
             result_tuples,
             result_count,
+
             &log_msg,
             &notice_msg,
             &err_msg);
 
-    time_msg(" processing pgr_bridges", start_t, clock());
+    time_msg("processing pgr_topological_sort", start_t, clock());
 
-    if (err_msg) {
-        if (*result_tuples) pfree(*result_tuples);
+
+    if (err_msg && (*result_tuples)) {
+        pfree(*result_tuples);
+        (*result_tuples) = NULL;
+        (*result_count) = 0;
     }
+
     pgr_global_report(log_msg, notice_msg, err_msg);
 
-    if (edges) pfree(edges);
     if (log_msg) pfree(log_msg);
     if (notice_msg) pfree(notice_msg);
     if (err_msg) pfree(err_msg);
-
+    if (edges) pfree(edges);
     pgr_SPI_finish();
 }
 
-PGDLLEXPORT Datum bridges(PG_FUNCTION_ARGS) {
+PGDLLEXPORT Datum
+topological_sort(PG_FUNCTION_ARGS) {
     FuncCallContext     *funcctx;
-    TupleDesc           tuple_desc;
+    TupleDesc            tuple_desc;
 
-    int64_t *result_tuples = NULL;
+    /**********************************************************************/
+    pgr_topological_sort_t *result_tuples = NULL;
     size_t result_count = 0;
+    /**********************************************************************/
 
     if (SRF_IS_FIRSTCALL()) {
         MemoryContext   oldcontext;
         funcctx = SRF_FIRSTCALL_INIT();
         oldcontext = MemoryContextSwitchTo(funcctx->multi_call_memory_ctx);
 
+
+        /**********************************************************************/
+        // pgr_topological_sort(
+        // sql TEXT,
+
         process(
                 text_to_cstring(PG_GETARG_TEXT_P(0)),
                 &result_tuples,
                 &result_count);
 
+        /**********************************************************************/
 
-#if PGSQL_VERSION > 94
-        funcctx->max_calls = (uint32_t)result_count;
+#if PGSQL_VERSION > 95
+        funcctx->max_calls = result_count;
 #else
         funcctx->max_calls = (uint32_t)result_count;
 #endif
+
         funcctx->user_fctx = result_tuples;
         if (get_call_result_type(fcinfo, NULL, &tuple_desc)
                 != TYPEFUNC_COMPOSITE) {
@@ -133,26 +139,31 @@ PGDLLEXPORT Datum bridges(PG_FUNCTION_ARGS) {
 
     funcctx = SRF_PERCALL_SETUP();
     tuple_desc = funcctx->tuple_desc;
-    result_tuples = (int64_t*) funcctx->user_fctx;
+    result_tuples = (pgr_topological_sort_t*) funcctx->user_fctx;
 
     if (funcctx->call_cntr < funcctx->max_calls) {
         HeapTuple    tuple;
         Datum        result;
         Datum        *values;
         bool*        nulls;
+        size_t       call_cntr = funcctx->call_cntr;
 
+        /**********************************************************************/
+        // OUT seq INTEGER,
+        // OUT sorted_v INTEGER)
 
-        values = palloc(2 * sizeof(Datum));
-        nulls = palloc(2 * sizeof(bool));
-
+        size_t numb = 2;
+        values = palloc(numb * sizeof(Datum));
+        nulls = palloc(numb * sizeof(bool));
 
         size_t i;
-        for (i = 0; i < 2; ++i) {
+        for (i = 0; i < numb; ++i) {
             nulls[i] = false;
         }
 
-        values[0] = Int32GetDatum(funcctx->call_cntr + 1);
-        values[1] = Int64GetDatum(result_tuples[funcctx->call_cntr]);
+        values[0] = Int32GetDatum(call_cntr + 1);
+        values[1] = Int32GetDatum(result_tuples[call_cntr].sorted_v);
+        /**********************************************************************/
 
         tuple = heap_form_tuple(tuple_desc, values, nulls);
         result = HeapTupleGetDatum(tuple);
