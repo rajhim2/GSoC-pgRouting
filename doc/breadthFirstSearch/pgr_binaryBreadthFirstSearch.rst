@@ -10,7 +10,7 @@
 pgr_binaryBreadthFirstSearch - Experimental
 ===============================================================================
 
-``pgr_breadthFirstSearch`` — Returns the shortest path(s) in a binary graph.
+``pgr_binaryBreadthFirstSearch`` — Returns the shortest path(s) in a binary graph.
 Any graph whose edge-weights belongs to the set {0,X}, where 'X' is any non-negative real integer, is termed as a 'binary graph'. 
 
 .. figure:: images/boost-inside.jpeg
@@ -29,7 +29,7 @@ Any graph whose edge-weights belongs to the set {0,X}, where 'X' is any non-nega
 Description
 -------------------------------------------------------------------------------
 
-It is well-known that the shortest paths between a single source and all other vertices can be found using Breadth First Search in :math:` O(|E|)` in an unweighted graph, i.e. the distance is the minimal number of edges that you need to traverse from the source to another vertex. We can interpret such a graph also as a weighted graph, where every edge has the weight 1. If not all edges in graph have the same weight, that we need a more general algorithm, like Dijkstra's Algorithm  which runs in :math:`O(|E|log|V|)` time.
+It is well-known that the shortest paths between a single source and all other vertices can be found using Breadth First Search in :math:`O(|E|)` in an unweighted graph, i.e. the distance is the minimal number of edges that you need to traverse from the source to another vertex. We can interpret such a graph also as a weighted graph, where every edge has the weight 1. If not all edges in graph have the same weight, that we need a more general algorithm, like Dijkstra's Algorithm  which runs in :math:`O(|E|log|V|)` time.
 
 However if the weights are more constrained, we can use a faster algorithm. This algorithm, termed as 'Binary Breadth First Search' aswell as '0-1 BFS', is a variation of the standard Breadth First Search problem to solve the SSSP (single-source shortest path) problem in :math:`O(|E|)`, if the weights of each edge belongs to the set {0,X}, where 'X' is any non-negative real integer.
 
@@ -182,10 +182,12 @@ Return Columns
     :end-before: return_path_end
 
 
-Example Application
+Example Data
 -------------------------------------------------------------------------------
 
-This algorithm is best applied when trying to answer queries such as the following:
+This type of data is used on the examples of this page.
+
+Edwards-Moore Algorithm is best applied when trying to answer queries such as the following:
 **“Find the path with the minimum number from Source to Destination”**
 Here:
 * *Source* = Source Vertex, *Destination* =  Any arbitrary destination vertex
@@ -208,15 +210,15 @@ from the given source and destination.
 Thus, the queries used in the previous section can be interpreted in this manner. 
 
 Table Data
--------------------------------------------------------------------------------
+...............................................................................
 
 
 The queries in the previous sections use the table 'roadworks'.
 The data of the table:
 
 .. literalinclude:: doc-pgr_binaryBreadthFirstSearch.queries
-   :start-after: --data
-   :end-before: --q1
+   :start-after: --data-start
+   :end-before: --data-end
 
 See Also
 -------------------------------------------------------------------------------
