@@ -170,7 +170,7 @@ PGDLLEXPORT Datum _pgr_boyermyrvold_1(PG_FUNCTION_ARGS) {
             OUT cost FLOAT,
         */
         /**********************************************************************/
-        size_t numb = 4;
+        size_t numb = 2;
         values = palloc(numb * sizeof(Datum));
         nulls = palloc(numb * sizeof(bool));
 
@@ -180,9 +180,7 @@ PGDLLEXPORT Datum _pgr_boyermyrvold_1(PG_FUNCTION_ARGS) {
         }
 
         values[0] = Int32GetDatum(funcctx->call_cntr + 1);
-        values[1] = Int64GetDatum(result_tuples[funcctx->call_cntr].source);
-        values[2] = Int64GetDatum(result_tuples[funcctx->call_cntr].target);
-        values[3] = Float8GetDatum(result_tuples[funcctx->call_cntr].cost);
+        values[1] = Int64GetDatum(result_tuples[funcctx->call_cntr].planarity);
 
         /**********************************************************************/
 
