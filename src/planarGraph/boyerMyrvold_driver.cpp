@@ -41,16 +41,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #include "cpp_common/pgr_base_graph.hpp"
 
 
-template < class G >
-std::vector<pgr_boyer_t>
-pgr_boyerMyrvold(
-        G &graph) {
-    pgrouting::functions::Pgr_boyerMyrvold< G > fn_boyerMyrvold;
-    auto results = fn_boyerMyrvold.boyerMyrvold(
-            graph);
-    return results;
-}
-
 void
 do_pgr_boyerMyrvold(
                 pgr_edge_t  *data_edges,
@@ -72,33 +62,39 @@ do_pgr_boyerMyrvold(
         pgassert(*return_count == 0);
         pgassert(total_edges != 0);
 
-        std::vector<pgr_boyer_t> results;
+        bool results = false;
         std::string logstr;
 
         graphType gType = UNDIRECTED;
         log << "Working with Undirected Graph\n";
         pgrouting::UndirectedGraph undigraph(gType);
         undigraph.insert_edges(data_edges, total_edges);
-        results = pgr_boyerMyrvold(undigraph);
+        pgrouting::functions::Pgr_boyerMyrvold<pgrouting::UndirectedGraph> fn_boyerMyrvold;
+        results=fn_boyerMyrvold.boyerMyrvold(undigraph);
+        logstr += fn_boyerMyrvold.get_log();
+        log << logstr;
 
 
-        auto count = results.size();
+        // auto count = results.size();
 
-        if (count == 0) {
-            (*return_tuples) = NULL;
-            (*return_count) = 0;
-            notice <<
-                "No Vertices";
-            *log_msg = pgr_msg(notice.str().c_str());
-            return;
-        }
-
-        (*return_tuples) = pgr_alloc(count, (*return_tuples));
-        log << "\nConverting a set of traversals into the tuples";
-        for (size_t i = 0; i < count; i++) {
-            *((*return_tuples) + i) = results[i];
-        }
-        (*return_count) = count;
+        // if (count == 0) {
+        //     (*return_tuples) = NULL;
+        //     (*return_count) = 0;
+        //     notice <<
+        //         "No Vertices";
+        //     *log_msg = pgr_msg(notice.str().c_str());
+        //     return;
+        // }
+        //
+        // (*return_tuples) = pgr_alloc(count, (*return_tuples));
+        // log << "\nConverting a set of traversals into the tuples";
+        // for (size_t i = 0; i < count; i++) {
+        //     *((*return_tuples) + i) = results[i];
+        // }
+        if(results){
+        (*return_count) = 1;
+      } else (*return_count) = 0;
+        log<<"See Here"<<(*return_count)<< "It's Working\n";
 
         pgassert(*err_msg == NULL);
         *log_msg = log.str().empty()?
