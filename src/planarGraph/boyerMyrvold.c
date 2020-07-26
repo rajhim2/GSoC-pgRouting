@@ -66,6 +66,7 @@ process(
     PGR_DBG("Total %ld edges in query:", total_edges);
 
     if (total_edges == 0) {
+        *result_count = 2;
         pgr_SPI_finish();
         return;
     }
@@ -118,7 +119,12 @@ PGDLLEXPORT Datum _pgr_boyermyrvold_1(PG_FUNCTION_ARGS) {
           &result_tuples,
           &result_count);
       PGR_DBG("%ld",result_count);
+      if(result_count == 1)
       PG_RETURN_BOOL(result_count);
+      else if (result_count == 0)
+      PG_RETURN_BOOL(result_count);
+      else if(result_count == 2)
+      PG_RETURN_NULL();
       PGR_DBG("Clean up code");
 //     FuncCallContext *funcctx;
 //     TupleDesc tuple_desc;
