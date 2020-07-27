@@ -58,7 +58,7 @@ extern "C" {
                 pgr_edge_t  *data_edges,
                 size_t total_tuples,
                 pgr_boyer_t **return_tuples,
-                size_t *return_count,
+                size_t *planarity,
                 char ** log_msg,
                 char ** notice_msg,
                 char ** err_msg);

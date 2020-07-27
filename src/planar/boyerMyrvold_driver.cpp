@@ -1,30 +1,23 @@
 /*PGR-GNU*****************************************************************
 File: boyerMyrvold_driver.cpp
-
 Generated with Template by:
 Copyright (c) 2020 pgRouting developers
 Mail: project@pgrouting.org
-
 Function's developer:
 Copyright (c) 2020 Himanshu Raj
 Mail: raj.himanshu2@gmail.com
-
 ------
-
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
 (at your option) any later version.
-
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 GNU General Public License for more details.
-
 You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-
 ********************************************************************PGR-GNU*/
 
 #include "drivers/planar/boyerMyrvold_driver.h"
@@ -41,14 +34,13 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #include "cpp_common/pgr_base_graph.hpp"
 
 
-
 void
 do_pgr_boyerMyrvold(
                 pgr_edge_t  *data_edges,
                 size_t total_edges,
 
                 pgr_boyer_t **return_tuples,
-                size_t *return_count,
+                size_t *planarity,
                 char ** log_msg,
                 char ** notice_msg,
                 char ** err_msg) {
@@ -60,10 +52,10 @@ do_pgr_boyerMyrvold(
         pgassert(!(*notice_msg));
         pgassert(!(*err_msg));
         pgassert(!(*return_tuples));
-        pgassert(*return_count == 0);
+        pgassert(*planarity == 0);
         pgassert(total_edges != 0);
 
-        std::vector<pgr_boyer_t> results;
+        bool results = false;
         std::string logstr;
 
         graphType gType = UNDIRECTED;
@@ -76,23 +68,26 @@ do_pgr_boyerMyrvold(
         log << logstr;
 
 
-        auto count = results.size();
+        // auto count = results.size();
 
-        if (count == 0) {
-            (*return_tuples) = NULL;
-            (*return_count) = 0;
-            notice <<
-                "No Vertices";
-            *log_msg = pgr_msg(notice.str().c_str());
-            return;
-        }
-
-        (*return_tuples) = pgr_alloc(count, (*return_tuples));
-        log << "\nConverting a set of traversals into the tuples";
-        for (size_t i = 0; i < count; i++) {
-            *((*return_tuples) + i) = results[i];
-        }
-        (*return_count) = count;
+        // if (count == 0) {
+        //     (*return_tuples) = NULL;
+        //     (*planarity) = 0;
+        //     notice <<
+        //         "No Vertices";
+        //     *log_msg = pgr_msg(notice.str().c_str());
+        //     return;
+        // }
+        //
+        // (*return_tuples) = pgr_alloc(count, (*return_tuples));
+        // log << "\nConverting a set of traversals into the tuples";
+        // for (size_t i = 0; i < count; i++) {
+        //     *((*return_tuples) + i) = results[i];
+        // }
+        if(results){
+        (*planarity) = 1;
+      } else (*planarity) = 0;
+        log<<"See Here"<<(*planarity)<< "It's Working\n";
 
         pgassert(*err_msg == NULL);
         *log_msg = log.str().empty()?
@@ -103,19 +98,19 @@ do_pgr_boyerMyrvold(
             pgr_msg(notice.str().c_str());
     } catch (AssertFailedException &except) {
         (*return_tuples) = pgr_free(*return_tuples);
-        (*return_count) = 0;
+        (*planarity) = 0;
         err << except.what();
         *err_msg = pgr_msg(err.str().c_str());
         *log_msg = pgr_msg(log.str().c_str());
     } catch (std::exception &except) {
         (*return_tuples) = pgr_free(*return_tuples);
-        (*return_count) = 0;
+        (*planarity) = 0;
         err << except.what();
         *err_msg = pgr_msg(err.str().c_str());
         *log_msg = pgr_msg(log.str().c_str());
     } catch(...) {
         (*return_tuples) = pgr_free(*return_tuples);
-        (*return_count) = 0;
+        (*planarity) = 0;
         err << "Caught unknown exception!";
         *err_msg = pgr_msg(err.str().c_str());
         *log_msg = pgr_msg(log.str().c_str());
